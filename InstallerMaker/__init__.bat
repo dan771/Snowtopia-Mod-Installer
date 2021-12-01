@@ -1,6 +1,6 @@
 @ECHO OFF
 
-python Converer(binaryToB64).py
+python Converter(binaryToB64).py
 python AssemblyMatch.py
 
 del Assembly-CSharp.txt.b64
