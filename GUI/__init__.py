@@ -1,16 +1,21 @@
 import tkinter as tk
-from tkinter import DISABLED, ttk
+from tkinter import DISABLED, Canvas, Scrollbar, ttk
 from tkinter import filedialog
 from tkinter import messagebox
 
 import shutil
 
+import webbrowser
+
 import sys
 import os
+from turtle import right
 import zipfile
 
 from distutils import command
 from distutils.command import install
+
+import click
 
 import Validator
 import Converter_b64ToBinary as B64toB
@@ -25,7 +30,8 @@ filename = False
 BasePath = False
 AssemblyPath = False
 ManagedPath = False
-current = os.path.dirname(os.path.abspath(__file__))
+#current = os.path.dirname(sys.executable)
+current = os.getcwd()
 ChangeLogs = os.listdir(f'{current}/ChangeLogs/')
 CurrentChangeLog = False
 SelectedChangeLog = False
@@ -83,7 +89,7 @@ class tkinterApp(tk.Tk):
 
                         frame.grid(row = 0, column = 0, sticky ="nsew")
 
-                self.show_frame(StartPage)
+                self.show_frame(Configure)
 
         # to display the current frame passed as
         # parameter
@@ -110,6 +116,13 @@ class StartPage(tk.Frame):
                 #blank space (padding)
                 fill2 = ttk.Label(self, text='')
                 fill2.grid(row = 3, column = 0, pady=40)
+
+                #help link
+                helpLink = ttk.Label(self, text="Need Help?",font=('Helveticabold', 10),foreground = "blue", cursor="hand2")
+                helpLink.grid(row = 4, column = 0, padx = 10, sticky = tk.W)
+
+                #make text an actual link
+                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
 
                 #Next button
                 button2 = ttk.Button(self, text ="Next Page",
@@ -145,8 +158,15 @@ class EnterFile(tk.Frame):
 
                 #blank space (padding)
                 fill2 = ttk.Label(self, text='')
-                fill2.grid(row = 5, column = 0, pady=29)
+                fill2.grid(row = 5, column = 0, pady=30)
                 
+                #help link
+                helpLink = ttk.Label(self, text="Need Help?",font=('Helveticabold', 10),foreground = "blue", cursor="hand2")
+                helpLink.grid(row = 6, column = 0, padx = 10, sticky = tk.W)
+
+                #make text an actual link
+                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
+
                 #Next button
                 global Page1Next
                 Page1Next = ttk.Button(self, text ="Next Page",
@@ -213,7 +233,14 @@ class Validate(tk.Frame):
                 
                 #blank space (padding)
                 fill2 = ttk.Label(self, text='')
-                fill2.grid(row = 4, column = 0, pady=42)
+                fill2.grid(row = 4, column = 0, pady=44)
+
+                #help link
+                helpLink = ttk.Label(self, text="Need Help?",font=('Helveticabold', 10),foreground = "blue", cursor="hand2")
+                helpLink.grid(row = 5, column = 0, padx = 10, sticky = tk.W)
+
+                #make text an actual link
+                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
 
                 #Next button
                 global Page2Next
@@ -256,12 +283,24 @@ class Configure(tk.Frame):
 
                 #heading
                 label = ttk.Label(self, text ="Configuration - Select maps to install", font = LARGEFONT)
-                label.grid(row = 1, column = 0, pady = 10)
+                label.grid(row = 1, column = 0, pady = 5)
+
+                #selection canvas
+                base = tk.Canvas(self)
+                base.grid(row = 4, column = 0)
+
+                #scrollbar for opt (Listbox)
+                scroll = Scrollbar(base)
+                scroll.pack(side=tk.RIGHT, fill=tk.Y)
 
                 #this gets messy but it's because of having assigments in certain locations
                 #selection pane
-                opt = tk.Listbox(self, selectmode="multiple")
-                opt.grid(row = 4, column = 0, pady = 5)
+                opt = tk.Listbox(base, selectmode="multiple")
+                opt.pack()
+
+                #applying scrollbar to ListBox (opt)
+                opt.config(yscrollcommand=scroll.set)
+                scroll.config(command=opt.yview)
 
                 #drop-down menu
                 options = ['Select...','Top 10', 'Top 25', 'None', 'Custom']
@@ -271,38 +310,72 @@ class Configure(tk.Frame):
 
                 def UpdateSelectedMaps():
                         global SelectedMaps
-                        if clicked.get() == 'Custom':
-                                SelectedMaps = opt.selection_get().split('\n')
-                        elif clicked.get != 'None':
-                                with open('TopMaps.cfg') as f:
-                                        if clicked.get() == 'Top 10':
-                                                SelectedMaps = f.readlines()[0].split(',')
-                                        elif clicked.get() == 'Top 25':
-                                                SelectedMaps = f.readlines()[1].split(',')
+                        SelectedMaps = opt.selection_get().split('\n')
 
                 #Next button
                 NextPage = ttk.Button(self, text ="Next Page", state = 'disabled',
                 command = lambda : [UpdateSelectedMaps(), controller.show_frame(InstallPage)])
                 
-                NextPage.grid(row = 5, column = 0, padx = 10, pady = 10, sticky = tk.E)
+                NextPage.grid(row = 6, column = 0, padx = 10, pady = 10, sticky = tk.E)
 
-                #a bit messy but function has to be here
+                #a bit messy but these functions have to be here
+
                 def UpdateDropSelection(event):
+                        clicked.set("Custom")
                         NextPage['state'] = 'enabled'
-                        if clicked.get() == 'Custom':
-                                opt['state'] = 'normal'
-                        else:
-                                opt['state'] = 'disabled'
+
+                opt.bind('<<ListboxSelect>>', UpdateDropSelection)
+
+                def UpdateDropSelectionMaps(event):
+                        if clicked.get() != 'Select...':
+                                NextPage['state'] = 'enabled'
+                        if clicked.get() == 'None':
+                                opt.select_clear(0, tk.END)
+                                return
+                        with open('TopMaps.cfg') as f:
+                                if clicked.get() == 'Top 10':
+                                        opt.select_clear(0, tk.END)
+                                        Top10Maps = f.readlines()[0].split(',')
+                                        Top10Maps[-1] = Top10Maps[-1][:-1]
+                                        for select in Top10Maps:
+                                                opt.select_set(maps.index(select))
+                                        return
+                                if clicked.get() == 'Top 25':
+                                        opt.select_clear(0, tk.END)
+                                        Top25Maps = f.readlines()[1].split(',')
+                                        for select in Top25Maps:
+                                                opt.select_set(maps.index(select))
+                                        return
 
                 # Create Dropdown menu
-                drop = ttk.OptionMenu(self, clicked, *options, command = UpdateDropSelection)
+                drop = ttk.OptionMenu(self, clicked, *options, command = UpdateDropSelectionMaps)
                 drop.grid(row = 3, column = 0, pady = 7)
 
                 #inflate map selection
                 for i in maps:
                         opt.insert(tk.END, i)
-                
-                opt['state'] = 'disabled'
+
+                #padding
+                padding = ttk.Label(self, text="")
+                padding.grid(row = 5, column = 0, pady = 2)
+
+                #help box (for both help and selection of maps)
+                helpBox = Canvas(self)
+                helpBox.grid(row = 6, column = 0, padx = 10, sticky = tk.W)
+
+                #help link
+                helpLink = ttk.Label(helpBox, text="Need Help?",font=('Helveticabold', 10),foreground = "blue", cursor="hand2")
+                helpLink.grid(row=0, column=0, padx=10)
+
+                #make text an actual link
+                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
+
+                #maps link
+                mapLink = ttk.Label(helpBox, text="Browse maps",font=('Helveticabold', 10),foreground = "blue", cursor="hand2")
+                mapLink.grid(row=0, column=1, padx=10)
+
+                #make text an actual link
+                mapLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
 
 class InstallPage(tk.Frame):
         def __init__(self, parent, controller):
@@ -326,7 +399,14 @@ class InstallPage(tk.Frame):
 
                 #blank space (padding)
                 fill2 = ttk.Label(self, text='')
-                fill2.grid(row = 4, column = 0, pady=42)
+                fill2.grid(row = 4, column = 0, pady=44)
+
+                #help link
+                helpLink = ttk.Label(self, text="Need Help?",font=('Helveticabold', 10),foreground = "blue", cursor="hand2")
+                helpLink.grid(row=5, column=0, padx=10, sticky=tk.W)
+
+                #make text an actual link
+                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
 
                 #next
                 global FinalNext
@@ -343,6 +423,7 @@ class InstallPage(tk.Frame):
 
                 if CurrentChangeLog != False:
                         AssemblyPatch.Patch(f'ChangeLogs/{CurrentChangeLog}', "Assembly-CSharp.txt.b64")
+                        print("erm")
                 
                 AssemblyPatch.Patch('ChangeLogs/Install.txt', "NewAssembly.txt.b64")
                 B64toB.Convert(AssemblyPath)
