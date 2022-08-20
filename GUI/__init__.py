@@ -70,9 +70,8 @@ class tkinterApp(tk.Tk):
                 container.pack(side = "top", fill = "both", expand = False)
                 
                 self.geometry('450x325+700+200')
+                self.minsize(450, 325)
                 self.title('Snowtopia Mod Installer')
-
-                self.resizable(False, False)
                 
                 # initializing frames to an empty array
                 self.frames = {}
@@ -89,7 +88,7 @@ class tkinterApp(tk.Tk):
 
                         frame.grid(row = 0, column = 0, sticky ="nsew")
 
-                self.show_frame(Configure)
+                self.show_frame(StartPage)
 
         # to display the current frame passed as
         # parameter
@@ -122,7 +121,7 @@ class StartPage(tk.Frame):
                 helpLink.grid(row = 4, column = 0, padx = 10, sticky = tk.W)
 
                 #make text an actual link
-                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
+                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://snowtopia-modders.fandom.com/wiki/Manual_installation_guide"))
 
                 #Next button
                 button2 = ttk.Button(self, text ="Next Page",
@@ -165,7 +164,7 @@ class EnterFile(tk.Frame):
                 helpLink.grid(row = 6, column = 0, padx = 10, sticky = tk.W)
 
                 #make text an actual link
-                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
+                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://snowtopia-modders.fandom.com/wiki/Manual_installation_guide"))
 
                 #Next button
                 global Page1Next
@@ -240,7 +239,7 @@ class Validate(tk.Frame):
                 helpLink.grid(row = 5, column = 0, padx = 10, sticky = tk.W)
 
                 #make text an actual link
-                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
+                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://snowtopia-modders.fandom.com/wiki/Manual_installation_guide"))
 
                 #Next button
                 global Page2Next
@@ -308,9 +307,10 @@ class Configure(tk.Frame):
                 # datatype of menu text
                 clicked = tk.StringVar()
 
-                def UpdateSelectedMaps():
+                def UpdateSelectedMaps(): #this gets called when next button is pressed and basically configures selection for install
                         global SelectedMaps
-                        SelectedMaps = opt.selection_get().split('\n')
+                        if SelectedMaps != []: #null check
+                                SelectedMaps = opt.selection_get().split('\n')
 
                 #Next button
                 NextPage = ttk.Button(self, text ="Next Page", state = 'disabled',
@@ -368,7 +368,7 @@ class Configure(tk.Frame):
                 helpLink.grid(row=0, column=0, padx=10)
 
                 #make text an actual link
-                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
+                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://snowtopia-modders.fandom.com/wiki/Manual_installation_guide"))
 
                 #maps link
                 mapLink = ttk.Label(helpBox, text="Browse maps",font=('Helveticabold', 10),foreground = "blue", cursor="hand2")
@@ -406,7 +406,7 @@ class InstallPage(tk.Frame):
                 helpLink.grid(row=5, column=0, padx=10, sticky=tk.W)
 
                 #make text an actual link
-                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://www.snowtopiamodding.com"))
+                helpLink.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://snowtopia-modders.fandom.com/wiki/Manual_installation_guide"))
 
                 #next
                 global FinalNext
@@ -423,7 +423,6 @@ class InstallPage(tk.Frame):
 
                 if CurrentChangeLog != False:
                         AssemblyPatch.Patch(f'ChangeLogs/{CurrentChangeLog}', "Assembly-CSharp.txt.b64")
-                        print("erm")
                 
                 AssemblyPatch.Patch('ChangeLogs/Install.txt', "NewAssembly.txt.b64")
                 B64toB.Convert(AssemblyPath)
