@@ -1,0 +1,7 @@
+ChangeLogs/
+ModData.zip
+TopMaps.cfg
+maps/
+__pycache__/
+logfile.log
+ForceOverwrite.cfg
