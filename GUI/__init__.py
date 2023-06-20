@@ -154,7 +154,7 @@ class EnterFile(tk.Frame):
                 Page1Next.grid(row = 6, column = 0, padx = 10, pady = 10, sticky=tk.E)
 
         def fileDialog(self):
-                global AssemblyPath
+                global AssemblyPath, BasePath
                 PathLabel = self.grid_slaves(column = 1, row = 2)
                 for i in PathLabel:
                         i.destroy()
@@ -310,8 +310,7 @@ class Configure(tk.Frame):
 
                 def UpdateSelectedMaps(): #this gets called when next button is pressed and basically configures selection for install
                         global SelectedMaps
-                        if SelectedMaps != []: #null check
-                                SelectedMaps = opt.selection_get().split('\n')
+                        SelectedMaps = opt.selection_get().split('\n')
 
                 #Next button
                 NextPage = ttk.Button(self, text ="Next Page", state = 'disabled',
@@ -444,6 +443,7 @@ class InstallPage(tk.Frame):
                 FinalNext.grid(row = 9, column = 0, padx = 10, pady = 10, sticky = tk.E)
 
         def Install(self, parent, controller):
+                InstallButton['state'] = 'disabled'
                 ProgressText.config(text="Progess... 0%")
                 incriment = (1 / (4 + (CurrentChangeLog != False) + 2*(ConfigOverwrite == False) + (os.path.exists(f'{BasePath}/ModData')) + 2*(os.path.exists(ModDataZip)))) * 100
 
@@ -525,12 +525,13 @@ class InstallPage(tk.Frame):
                         ProgressBar['value'] += incriment
 
                 FinalNext['state'] = 'enabled'
-                InstallButton['state'] = 'disabled'
 
                 #cleanup - 4
                 ProgressText.config(text=f'Cleaning up... {round(ProgressBar["value"])}%')
                 os.remove("Assembly-CSharp.txt.b64")
                 os.remove("NewAssembly.txt.b64")
+                if os.path.exists("False"):
+                        shutil.rmtree("False")
                 ProgressBar['value'] += incriment
                 ProgressText.config(text='Installed Successfully!')
 
