@@ -259,12 +259,11 @@ class Validate(tk.Frame):
 
                         with open('ForceOverwrite.cfg', 'r') as ForceOverwriteFile:
                                 ForceOverwriteLines = ForceOverwriteFile.readlines()
+                                ConfigOverwriteBox['state'] = "normal"
                                 for ForceOverwriteLine in ForceOverwriteLines:
                                         if not(str(result) in ForceOverwriteLine):
                                                 continue
-                                        if "normal" in ForceOverwriteLine:
-                                                ConfigOverwriteBox['state'] = "normal"
-                                        else:
+                                        if "overwrite" in ForceOverwriteLine:
                                                 ConfigOverwriteBox['state'] = "disabled"
                                         break
                 else:
