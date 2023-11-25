@@ -1,6 +1,5 @@
 import base64
 import imp
-from locale import currency
 import diff_match_patch as dmp_module
 import os
 
