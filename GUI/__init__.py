@@ -442,9 +442,10 @@ class InstallPage(tk.Frame):
                 FinalNext.grid(row = 9, column = 0, padx = 10, pady = 10, sticky = tk.E)
 
         def Install(self, parent, controller):
+                ConfigOverwriteBox['state'] = 'disabled'
                 InstallButton['state'] = 'disabled'
                 ProgressText.config(text="Progess... 0%")
-                incriment = (1 / (4 + (CurrentChangeLog != False) + 2*(ConfigOverwrite == False) + (os.path.exists(f'{BasePath}/ModData')) + 2*(os.path.exists(ModDataZip)))) * 100
+                incriment = (1 / (4 + (CurrentChangeLog != False) + 2*(ConfigOverwrite.get() == False) + (os.path.exists(f'{BasePath}/ModData')) + 2*(os.path.exists(ModDataZip)))) * 100
 
                 ProgressText.config(text=f'Converting Assembly to B64... {round(ProgressBar["value"])}%')
                 BtoB64.Convert(AssemblyPath) #1
@@ -467,24 +468,20 @@ class InstallPage(tk.Frame):
 
                 if os.path.exists(ModDataZip):
                         if os.path.exists(f'{BasePath}/ModData'):
-                                if ConfigOverwrite == False:
+                                if ConfigOverwrite.get() == False:
                                         ProgressText.config(text=f'Saving old configs... {round(ProgressBar["value"])}%')
 
-                                        balanceCfgFile = open(f'{BasePath}/ModData/balance.cfg', 'r') #?
-                                        balanceCfg = balanceCfgFile.read()
-                                        balanceCfgFile.close()
+                                        with open(f'{BasePath}/ModData/balance.cfg', 'r') as balanceCfgFile:
+                                                balanceCfg = balanceCfgFile.read()
 
-                                        basicCfgFile = open(f'{BasePath}/ModData/basic.cfg', 'r')
-                                        basicCfg = basicCfgFile.read()
-                                        basicCfgFile.close()
+                                        with open(f'{BasePath}/ModData/basic.cfg', 'r') as basicCfgFile:
+                                                basicCfg = basicCfgFile.read()
 
-                                        constructionCfgFile = open(f'{BasePath}/ModData/construction.cfg', 'r')
-                                        constructionCfg = constructionCfgFile.read()
-                                        constructionCfgFile.close()
+                                        with open(f'{BasePath}/ModData/construction.cfg', 'r') as constructionCfgFile:
+                                                constructionCfg = constructionCfgFile.read()
 
-                                        economyCfgFile = open(f'{BasePath}/ModData/economy.cfg', 'r')
-                                        economyCfg = economyCfgFile.read()
-                                        economyCfgFile.close()
+                                        with open(f'{BasePath}/ModData/economy.cfg', 'r') as economyCfgFile:
+                                                economyCfg = economyCfgFile.read()
 
                                         ProgressBar['value'] += incriment
 
@@ -500,21 +497,19 @@ class InstallPage(tk.Frame):
                         
                         if balanceCfg != '':
                                 ProgressText.config(text=f'Loading saved configs... {round(ProgressBar["value"])}%')
-                                balanceCfgFile = open(f'{BasePath}/ModData/balance.cfg', 'w') #?
-                                balanceCfgFile.write(balanceCfg)
-                                balanceCfgFile.close()
+                                
+                                with open(f'{BasePath}/ModData/balance.cfg', 'w') as balanceCfgFile:
+                                        balanceCfgFile.write(balanceCfg)
 
-                                basicCfgFile = open(f'{BasePath}/ModData/basic.cfg', 'w')
-                                basicCfgFile.write(basicCfg)
-                                basicCfgFile.close()
+                                with open(f'{BasePath}/ModData/basic.cfg', 'w') as basicCfgFile:
+                                        basicCfgFile.write(basicCfg)
+                                
+                                with open(f'{BasePath}/ModData/construction.cfg', 'w') as constructionCfgFile:
+                                        constructionCfgFile.write(constructionCfg)
 
-                                constructionCfgFile = open(f'{BasePath}/ModData/construction.cfg', 'w')
-                                constructionCfgFile.write(constructionCfg)
-                                constructionCfgFile.close()
+                                with open(f'{BasePath}/ModData/economy.cfg', 'w') as economyCfgFile:
+                                        economyCfgFile.write(economyCfg)
 
-                                economyCfgFile = open(f'{BasePath}/ModData/economy.cfg', 'w')
-                                economyCfgFile.write(economyCfg)
-                                economyCfgFile.close()
                                 ProgressBar['value'] += incriment
 
                         ProgressText.config(text=f'Adding maps... {round(ProgressBar["value"])}%')
