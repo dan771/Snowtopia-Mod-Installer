@@ -5,3 +5,10 @@ maps/
 __pycache__/
 logfile.log
 ForceOverwrite.cfg
+
+GUI/build
+GUI/__pycache__
+GUI/maps
+GUI/__init__.specx
+GUI/Blizzard.zip
+GUI/logs
