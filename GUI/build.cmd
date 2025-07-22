@@ -1,0 +1,14 @@
+pyinstaller __init__.py ^
+  --onefile ^
+  --noupx ^
+  -w ^
+  --clean ^
+  -i "../blizzard_logo.ico" ^
+  --add-data "datatable.py;." ^
+  --add-data "Validator.py;." ^
+  --add-data "diff_match_patch.py;." ^
+  --add-data "Converter_b64ToBinary.py;." ^
+  --add-data "Converter_binaryToB64.py;." ^
+  --add-data "AssemblyPatch.py;." ^
+  --hidden-import=requests ^
+  --hidden-import=bs4
